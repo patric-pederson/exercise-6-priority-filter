@@ -4,17 +4,35 @@
   <meta charset="UTF-8" />
   <title>Equipment Requests</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { border: 1px solid #ccc; padding: 0.6rem; text-align: left; }
+    body { font-family: system-ui, sans-serif; max-width: 780px; margin: 2rem auto; padding: 0 1rem; color: #111827; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 1.25rem 0 0.75rem; }
+    .filter-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .filter-btn { padding: 0.45rem 0.85rem; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; }
+    .filter-btn:hover { background: #f3f4f6; }
+    .filter-btn.active { background: #1d4ed8; color: #ffffff; border-color: #1d4ed8; }
+    .result-count { font-size: 0.9rem; color: #4b5563; font-weight: 500; }
+    table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+    th, td { border: 1px solid #d1d5db; padding: 0.65rem; text-align: left; }
+    th { background: #f3f4f6; }
     .priority-high { color: #b91c1c; font-weight: 700; }
     .priority-medium { color: #b45309; font-weight: 600; }
     .priority-low { color: #374151; }
+    .empty-state { text-align: center; color: #6b7280; padding: 1.25rem; font-style: italic; }
   </style>
 </head>
 <body>
   <h1>Equipment Requests</h1>
   <p>Track and review incoming department equipment requests.</p>
+
+  <div class="toolbar">
+    <div class="filter-group" role="group" aria-label="Priority filters">
+      <button type="button" class="filter-btn active" data-filter="all">All</button>
+      <button type="button" class="filter-btn" data-filter="attention">Needs Attention (High &amp; Medium)</button>
+      <button type="button" class="filter-btn" data-filter="high">High Only</button>
+      <button type="button" class="filter-btn" data-filter="low">Low Only</button>
+    </div>
+    <span id="result-count" class="result-count">Showing 6 of 6 requests</span>
+  </div>
 
   <table id="requests-table">
     <thead>
@@ -39,9 +57,34 @@
       { id: "REQ-106", item: "Conference Room Webcam", department: "Marketing", priority: "Low", status: "Approved" }
     ];
 
-    function renderRequests(list) {
+    let activeFilter = "all";
+
+    function getFilteredRequests() {
+      if (activeFilter === "attention") {
+        return requests.filter(req => req.priority === "High" || req.priority === "Medium");
+      }
+      if (activeFilter === "high") {
+        return requests.filter(req => req.priority === "High");
+      }
+      if (activeFilter === "low") {
+        return requests.filter(req => req.priority === "Low");
+      }
+      return requests;
+    }
+
+    function renderRequests() {
       const tbody = document.getElementById("requests-body");
-      tbody.innerHTML = list.map(req => `
+      const countLabel = document.getElementById("result-count");
+      const filtered = getFilteredRequests();
+
+      countLabel.textContent = `Showing ${filtered.length} of ${requests.length} requests`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No matching equipment requests</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(req => `
         <tr>
           <td>${req.id}</td>
           <td>${req.item}</td>
@@ -52,7 +95,16 @@
       `).join("");
     }
 
-    renderRequests(requests);
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeFilter = btn.dataset.filter;
+        renderRequests();
+      });
+    });
+
+    renderRequests();
   </script>
 </body>
 </html>
