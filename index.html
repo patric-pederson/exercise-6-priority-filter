@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Equipment Requests</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #ccc; padding: 0.6rem; text-align: left; }
+    .priority-high { color: #b91c1c; font-weight: 700; }
+    .priority-medium { color: #b45309; font-weight: 600; }
+    .priority-low { color: #374151; }
+  </style>
+</head>
+<body>
+  <h1>Equipment Requests</h1>
+  <p>Track and review incoming department equipment requests.</p>
+
+  <table id="requests-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Item</th>
+        <th>Department</th>
+        <th>Priority</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="requests-body"></tbody>
+  </table>
+
+  <script>
+    const requests = [
+      { id: "REQ-101", item: "Replacement Barcode Scanner", department: "Warehouse", priority: "High", status: "Pending" },
+      { id: "REQ-102", item: "27-inch External Monitor", department: "Finance", priority: "Low", status: "Pending" },
+      { id: "REQ-103", item: "Backup Network Switch", department: "IT", priority: "High", status: "In Review" },
+      { id: "REQ-104", item: "Ergonomic Keyboard", department: "HR", priority: "Medium", status: "Pending" },
+      { id: "REQ-105", item: "Label Printer Rollers", department: "Shipping", priority: "Medium", status: "Pending" },
+      { id: "REQ-106", item: "Conference Room Webcam", department: "Marketing", priority: "Low", status: "Approved" }
+    ];
+
+    function renderRequests(list) {
+      const tbody = document.getElementById("requests-body");
+      tbody.innerHTML = list.map(req => `
+        <tr>
+          <td>${req.id}</td>
+          <td>${req.item}</td>
+          <td>${req.department}</td>
+          <td class="priority-${req.priority.toLowerCase()}">${req.priority}</td>
+          <td>${req.status}</td>
+        </tr>
+      `).join("");
+    }
+
+    renderRequests(requests);
+  </script>
+</body>
+</html>
